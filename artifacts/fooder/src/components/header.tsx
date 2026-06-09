@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Menu, User, LogOut, LayoutDashboard, ChevronDown } from "lucide-react";
+import { ShoppingCart, Menu, LogOut, LayoutDashboard, ChevronDown, Search, X } from "lucide-react";
 import { useGetCart } from "@workspace/api-client-react";
 import { 
   DropdownMenu, 
@@ -15,14 +16,60 @@ import { Sun, Moon } from "lucide-react";
 
 export function Header() {
   const { user, logout } = useAuth();
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const { data: cart } = useGetCart({ query: { enabled: !!user } });
   const { theme, setTheme } = useTheme();
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const totalItems = cart?.reduce((acc, item) => acc + item.quantity, 0) || 0;
 
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    if (q) {
+      setLocation(`/menu?q=${encodeURIComponent(q)}`);
+    } else {
+      setLocation("/menu");
+    }
+    setSearchOpen(false);
+    setSearchQuery("");
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      {/* Expanding search overlay */}
+      {searchOpen && (
+        <div className="absolute inset-0 z-10 flex items-center bg-background px-4 gap-3">
+          <Search className="h-5 w-5 text-muted-foreground shrink-0" />
+          <form onSubmit={handleSearch} className="flex-1 flex items-center gap-2">
+            <input
+              autoFocus
+              type="text"
+              placeholder="Search for jollof rice, suya, puff puff..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="flex-1 bg-transparent outline-none text-foreground placeholder:text-muted-foreground text-base"
+              data-testid="input-header-search"
+            />
+            <button
+              type="submit"
+              className="bg-primary text-primary-foreground rounded-full px-4 py-1.5 text-sm font-semibold hover:opacity-90 transition-opacity shrink-0"
+              data-testid="button-header-search-submit"
+            >
+              Search
+            </button>
+          </form>
+          <button
+            onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
+            className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
+            data-testid="button-header-search-close"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+      )}
+
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2">
@@ -47,6 +94,16 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Search trigger */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setSearchOpen(true)}
+            title="Search"
+            data-testid="button-open-search"
+          >
+            <Search className="h-5 w-5" />
+          </Button>
           <Button 
             variant="ghost" 
             size="icon" 

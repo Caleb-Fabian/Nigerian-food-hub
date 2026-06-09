@@ -1,18 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useListMenuItems, useListCategories } from "@workspace/api-client-react";
 import { MenuItemCard } from "@/components/menu-item-card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 
 export default function Menu() {
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("q") || "";
+  });
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("q") || "";
+    setSearchQuery(q);
+  }, []);
   
   const { data: categories, isLoading: isLoadingCategories } = useListCategories();
   
-  // Use debounced search internally in a real app, but here we just pass it
   const { data: menuItems, isLoading: isLoadingMenu } = useListMenuItems({ 
     category: activeCategory,
     search: searchQuery || undefined
@@ -56,14 +64,24 @@ export default function Menu() {
           </div>
 
           {/* Search */}
-          <div className="relative w-full md:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <div className="relative w-full md:w-80">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
             <Input
               placeholder="Search dishes..."
-              className="pl-9 rounded-full"
+              className="pl-9 pr-9 rounded-full"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              data-testid="input-menu-search"
             />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                data-testid="button-clear-search"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
         </div>
       </div>

@@ -3,43 +3,76 @@ import { useListMenuItems, useListCategories } from "@workspace/api-client-react
 import { MenuItemCard } from "@/components/menu-item-card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Link } from "wouter";
-import { Input } from "@/components/ui/input";
+import { Link, useLocation } from "wouter";
 import { Search } from "lucide-react";
 
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
-  
+  const [heroSearch, setHeroSearch] = useState("");
+  const [, setLocation] = useLocation();
+
   const { data: categories, isLoading: isLoadingCategories } = useListCategories();
   
   const { data: menuItems, isLoading: isLoadingMenu } = useListMenuItems({ 
     category: activeCategory 
   });
 
+  function handleHeroSearch(e: React.FormEvent) {
+    e.preventDefault();
+    const q = heroSearch.trim();
+    if (q) {
+      setLocation(`/menu?q=${encodeURIComponent(q)}`);
+    } else {
+      setLocation("/menu");
+    }
+  }
+
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative bg-primary text-primary-foreground py-24 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-black/40 z-10" />
+      <section className="relative bg-primary text-primary-foreground py-28 px-4 overflow-hidden">
+        <div className="absolute inset-0 bg-black/50 z-10" />
         <div 
           className="absolute inset-0 z-0 bg-cover bg-center" 
           style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1596797038530-2c107229654b?q=80&w=2070&auto=format&fit=crop")' }}
         />
         <div className="container mx-auto relative z-20 text-center max-w-3xl">
-          <h1 className="text-5xl md:text-7xl font-serif font-bold mb-6 text-white drop-shadow-lg">
+          <h1 className="text-5xl md:text-7xl font-serif font-bold mb-4 text-white drop-shadow-lg">
             Taste the Soul of Lagos
           </h1>
           <p className="text-lg md:text-xl mb-8 text-white/90 drop-shadow-md">
-            Authentic Nigerian cuisine, cooked with passion and delivered to your doorstep. 
-            Experience the rich flavors of home.
+            Authentic Nigerian cuisine, cooked with passion and delivered to your doorstep.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/menu">
-              <Button size="lg" className="text-lg px-8 bg-white text-primary hover:bg-white/90 w-full sm:w-auto">
-                Order Now
-              </Button>
-            </Link>
-          </div>
+
+          {/* Hero Search */}
+          <form
+            onSubmit={handleHeroSearch}
+            className="flex items-center gap-2 bg-white rounded-full px-4 py-2 shadow-2xl max-w-xl mx-auto mb-6"
+            data-testid="form-hero-search"
+          >
+            <Search className="h-5 w-5 text-muted-foreground shrink-0" />
+            <input
+              type="text"
+              placeholder="Search for jollof rice, suya, egusi..."
+              value={heroSearch}
+              onChange={(e) => setHeroSearch(e.target.value)}
+              className="flex-1 bg-transparent outline-none text-foreground placeholder:text-muted-foreground text-base py-1"
+              data-testid="input-hero-search"
+            />
+            <button
+              type="submit"
+              className="bg-primary text-primary-foreground rounded-full px-5 py-2 text-sm font-semibold hover:opacity-90 transition-opacity shrink-0"
+              data-testid="button-hero-search"
+            >
+              Search
+            </button>
+          </form>
+
+          <Link href="/menu">
+            <Button variant="ghost" className="text-white/80 hover:text-white hover:bg-white/10 text-sm underline-offset-4 underline">
+              Browse full menu
+            </Button>
+          </Link>
         </div>
       </section>
 
