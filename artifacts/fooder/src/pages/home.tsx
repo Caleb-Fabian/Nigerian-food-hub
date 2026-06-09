@@ -38,7 +38,7 @@ export default function Home() {
         />
         <div className="container mx-auto relative z-20 text-center max-w-3xl">
           <h1 className="text-5xl md:text-7xl font-serif font-bold mb-4 text-white drop-shadow-lg">
-            Taste the Soul of Lagos
+            Experience the Naija culture with every taste
           </h1>
           <p className="text-lg md:text-xl mb-8 text-white/90 drop-shadow-md">
             Authentic Nigerian cuisine, cooked with passion and delivered to your doorstep.
