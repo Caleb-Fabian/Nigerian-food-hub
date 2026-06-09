@@ -56,7 +56,7 @@ export default function Home() {
               placeholder="Search for jollof rice, suya, egusi..."
               value={heroSearch}
               onChange={(e) => setHeroSearch(e.target.value)}
-              className="flex-1 bg-transparent outline-none text-foreground placeholder:text-muted-foreground text-base py-1"
+              className="flex-1 bg-transparent outline-none text-gray-900 placeholder:text-gray-400 text-base py-1"
               data-testid="input-hero-search"
             />
             <button

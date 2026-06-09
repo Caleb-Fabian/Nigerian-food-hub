@@ -49,7 +49,7 @@ export function Header() {
               placeholder="Search for jollof rice, suya, puff puff..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 bg-transparent outline-none text-foreground placeholder:text-muted-foreground text-base"
+              className="flex-1 bg-transparent outline-none text-foreground placeholder:text-muted-foreground text-base [color-scheme:light]"
               data-testid="input-header-search"
             />
             <button
