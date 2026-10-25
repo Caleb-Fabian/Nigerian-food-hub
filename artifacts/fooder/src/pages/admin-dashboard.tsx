@@ -77,14 +77,14 @@ export default function AdminDashboard() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
         <h1 className="text-3xl font-serif font-bold text-foreground">Admin Dashboard</h1>
-        <div className="flex gap-4">
+        <div className="flex gap-3">
           <Link href="/admin/orders">
-            <Button variant="outline">Manage Orders</Button>
+            <Button variant="outline" className="flex-1 sm:flex-none">Manage Orders</Button>
           </Link>
           <Link href="/admin/menu">
-            <Button>Manage Menu</Button>
+            <Button className="flex-1 sm:flex-none">Manage Menu</Button>
           </Link>
         </div>
       </div>

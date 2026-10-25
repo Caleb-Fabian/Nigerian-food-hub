@@ -2,15 +2,16 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Menu, LogOut, LayoutDashboard, ChevronDown, Search, X } from "lucide-react";
+import { ShoppingCart, Menu, LogOut, LayoutDashboard, ChevronDown, Search, X, UtensilsCrossed, ClipboardList } from "lucide-react";
 import { useGetCart } from "@workspace/api-client-react";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/components/ui/sheet";
 import { useTheme } from "./theme-provider";
 import { Sun, Moon } from "lucide-react";
 
@@ -21,6 +22,7 @@ export function Header() {
   const { theme, setTheme } = useTheme();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const totalItems = cart?.reduce((acc, item) => acc + item.quantity, 0) || 0;
 
@@ -171,12 +173,95 @@ export function Header() {
             </div>
           )}
 
-          {/* Mobile menu trigger could go here */}
-          <Button variant="ghost" size="icon" className="md:hidden">
+          {/* Mobile menu trigger */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={() => setMobileMenuOpen(true)}
+            aria-label="Open menu"
+          >
             <Menu className="h-5 w-5" />
           </Button>
         </div>
       </div>
+
+      {/* Mobile navigation sheet */}
+      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+        <SheetContent side="right" className="w-72 flex flex-col gap-0 p-0">
+          <SheetHeader className="px-6 pt-6 pb-4 border-b">
+            <SheetTitle className="text-2xl font-serif text-primary">Fooder</SheetTitle>
+          </SheetHeader>
+
+          <nav className="flex flex-col px-4 py-4 gap-1 flex-1">
+            <SheetClose asChild>
+              <Link
+                href="/menu"
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-muted ${location.startsWith('/menu') ? 'bg-muted text-primary' : 'text-foreground'}`}
+              >
+                <UtensilsCrossed className="h-4 w-4" />
+                Menu
+              </Link>
+            </SheetClose>
+
+            {user && (
+              <SheetClose asChild>
+                <Link
+                  href="/orders"
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-muted ${location.startsWith('/orders') ? 'bg-muted text-primary' : 'text-foreground'}`}
+                >
+                  <ClipboardList className="h-4 w-4" />
+                  My Orders
+                </Link>
+              </SheetClose>
+            )}
+
+            {user?.role === 'admin' && (
+              <SheetClose asChild>
+                <Link
+                  href="/admin"
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-muted ${location.startsWith('/admin') ? 'bg-muted text-primary' : 'text-foreground'}`}
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  Dashboard
+                </Link>
+              </SheetClose>
+            )}
+          </nav>
+
+          <div className="px-4 py-4 border-t flex flex-col gap-2">
+            {user ? (
+              <>
+                <div className="px-3 py-2">
+                  <p className="text-sm font-medium">{user.name}</p>
+                  <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                </div>
+                <Button
+                  variant="ghost"
+                  className="justify-start gap-2 text-destructive hover:text-destructive"
+                  onClick={() => { logout(); setMobileMenuOpen(false); }}
+                >
+                  <LogOut className="h-4 w-4" />
+                  Log out
+                </Button>
+              </>
+            ) : (
+              <>
+                <SheetClose asChild>
+                  <Link href="/login">
+                    <Button variant="outline" className="w-full">Log in</Button>
+                  </Link>
+                </SheetClose>
+                <SheetClose asChild>
+                  <Link href="/register">
+                    <Button className="w-full">Sign up</Button>
+                  </Link>
+                </SheetClose>
+              </>
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
     </header>
   );
 }
